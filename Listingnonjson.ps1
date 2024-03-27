@@ -9,7 +9,7 @@ function Get-ReportItems {
     $response = Invoke-WebRequest -Uri $Uri -Method Get -UseDefaultCredentials
 
     if ($response.StatusCode -eq 200) {
-        $response
+        $response.Content
     } else {
         Write-Host "Failed to retrieve report items. Status code: $($response.StatusCode)"
         exit
@@ -20,11 +20,11 @@ function Get-ReportItems {
 Write-Host "Listing reports..."
 
 $catalogItemsUri = "$ReportPortalUri/api/v2.0/CatalogItems"
-$reportsResponse = Get-ReportItems -Uri $catalogItemsUri
+$reportsContent = Get-ReportItems -Uri $catalogItemsUri
 
-if ($reportsResponse) {
+if ($reportsContent) {
     Write-Host "Reports found:"
-    $reports = $reportsResponse.Content | ConvertFrom-Json
+    $reports = $reportsContent | ConvertFrom-Json
     $reports.value | ForEach-Object {
         Write-Host "Name: $($_.Name), Path: $($_.Path)"
     }
