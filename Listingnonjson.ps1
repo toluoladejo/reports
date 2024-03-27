@@ -24,9 +24,8 @@ $reportsContent = Get-ReportItems -Uri $catalogItemsUri
 
 if ($reportsContent) {
     Write-Host "Reports found:"
-    $reports = $reportsContent | ConvertFrom-Json
-    $reports.value | ForEach-Object {
-        Write-Host "Name: $($_.Name), Path: $($_.Path)"
+    $reportsContent -split '\r?\n' | ForEach-Object {
+        Write-Host $_
     }
 } else {
     Write-Host "No reports found."
