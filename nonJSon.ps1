@@ -1,38 +1,26 @@
-function Get-ReportItems {
+# Function to list out report items
+function List-ReportItems {
     param (
-        [string]$Uri
+        [string]$ReportContent
     )
 
-    $response = Invoke-WebRequest -Uri $Uri -Method Get -UseDefaultCredentials
-
-    if ($response.StatusCode -eq 200) {
-        Write-Host "Response Content Type: $($response.Headers['Content-Type'])"
-        Write-Host "Response Content: $($response.Content)"
-
-        if ($response.Headers['Content-Type'] -like 'application/json') {
-            $data = $response.Content | ConvertFrom-Json
-            return $data.value
-        } else {
-            Write-Host "Non-JSON response received."
-            return $null
+    $reports = $ReportContent | ConvertFrom-Json
+    if ($reports) {
+        Write-Host "Reports found:"
+        $reports.value | ForEach-Object {
+            Write-Host "Name: $($_.Name), Path: $($_.Path)"
         }
     } else {
-        Write-Host "Failed to retrieve report items. Status code: $($response.StatusCode)"
-        exit
+        Write-Host "No reports found or invalid response received."
     }
 }
 
+# Usage
 Write-Host "Listing reports..."
 
 $ReportPortalUri = 'http://01.05.07.40/CD-you/newme'
 $catalogItemsUri = "$ReportPortalUri/api/v2.0/CatalogItems"
-$reports = Get-ReportItems -Uri $catalogItemsUri
+$reportContent = Get-ReportItems -Uri $catalogItemsUri
 
-if ($reports) {
-    Write-Host "Reports found:"
-    $reports | ForEach-Object {
-        Write-Host "Name: $($_.Name), Path: $($_.Path)"
-    }
-} else {
-    Write-Host "No reports found or invalid response received."
-}
+List-ReportItems -ReportContent $reportContent
+
