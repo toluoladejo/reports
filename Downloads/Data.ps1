@@ -27,7 +27,6 @@ $remoteReports = $SSRSProxy.ListChildren($reportPath,$true) | % { $_.Name+$fileE
 
 
 $localReports | ForEach-Object {
-
     
     $file = $sourceFiles+$_
 
@@ -35,12 +34,21 @@ $localReports | ForEach-Object {
     $bytes = [System.IO.File]::ReadAllBytes($file)
 
     if ($remoteReports -match $_) {
-        $cj = "with replacement"
-    }else{
-        $cj = ""
+        Write-Host $_" report found in report path: $reportPath "
+        Write-Host "Deleting '"$_"' report file...."
+        Remove-RsRestCatalogItem -RsItem $reportPath+"/"+$_ -ReportPortalUri $SSRSWebServiceUrl
+        
+        if ($?) {
+            Write-Host "Successfully deleted $report.path from $reportPath`n"
+        }else{
+            Write-Warning "Error occured while deleting the report "$report.path" report from $reportPath`n"
+        }  
+         
     }
 
-    Write-Host "Uploading "$cj" of "$_" report in progress..."
+    
+
+    Write-Host "Uploading of "$_" report in progress..."
 
     $report = $SSRSProxy.CreateCatalogItem(
         "Report",         # Catalog item type
@@ -114,4 +122,3 @@ $localReports | ForEach-Object {
 #} else {
 #    Write-Host "File uploaded successfully."
 #}
-
